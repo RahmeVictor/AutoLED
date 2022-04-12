@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block head %}
+    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script> <!-- Color picker -->
+    <script src="{{ url_for('static', filename='color-picker.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="center-container">
+        <div id="color-container" class="centered-div">
+            <div id="picker-container"></div>
+
+            <div id="brightness">
+                <label id='brightness-label' for="brightnessInput"></label>
+                <input type="range" min="1" max="100" value="{{ selectedController.brightness }}" class="slider"
+                       id="brightnessInput">
+            </div>
+        </div>
+
+        <div id="choose-controller-container" class="centered-div">
+            <label for="controllers">Choose a controller:</label>
+            <select class="custom-dropdown" name="controllers" id="controllers"
+                    onChange="window.location.href=this.value">
+                {% for controller in controllers %}
+                    <option {% if controller == selectedController %} selected {% endif %}
+                                                                      value={{ url_for('rgb_controller', cid=controller.cid) }}>{{ controller.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="centered-div">
+            <form action="/add_controller" method="post">
+                <input type="hidden" name="controllerID" value={{ selectedController.cid }}>
+                <label for="name">Controller name:</label>
+                <input type="text" id="name" name="name"><br>
+                <input class="btn" type="submit" value="Add controller">
+                <button class="btn" type="submit" formaction="/rename_controller">Rename controller</button>
+            </form>
+        </div>
+
+        <div class="centered-div">
+            <form action="/delete_controller" method="post">
+                <input type="hidden" name="controllerID" value={{ selectedController.cid }}>
+                <input class="btn" type="submit" value="Delete current controller">
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra %}
+    <script>
+        let colorPicker = new iro.ColorPicker("#picker-container", {
+            width: 250, // Size of the color picker
+            color: "{{ selectedController.color }}" // Initial color
+        });
+
+        colorPicker.on('color:change', function (color) {
+            send_color_data(color);
+        });
+    </script>
+{% endblock %}
