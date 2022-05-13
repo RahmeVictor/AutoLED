@@ -50,7 +50,7 @@
     <script>
         let colorPicker = new iro.ColorPicker("#picker-container", {
             width: 250, // Size of the color picker
-            color: "{{ selectedController.color }}" // Initial color
+            color: "{{ selectedController.get_hex_color() }}" // Initial color
         });
 
         colorPicker.on('color:change', function (color) {

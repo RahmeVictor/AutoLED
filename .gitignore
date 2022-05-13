@@ -1,4 +1,4 @@
 .idea
 /venv/
-controllers.conf
+controllers.json
 /__pycache__

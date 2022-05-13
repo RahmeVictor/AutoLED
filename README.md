@@ -11,7 +11,7 @@ The user inputs the desired color and brightness, which is then sent to the P981
 controllers can be wired in series and are accessed through their IDs: the first controller has ID 0, the second ID 1
 etc...
 
-Data about controllers is saved in controllers.conf
+Data about controllers is saved in controllers.json
 
 GPIOSim is used to simulate Raspberry's GPIO pins. It provides dummy functions that do nothing.
 

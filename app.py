@@ -5,7 +5,6 @@ from led_controllers import ControllerChain, LEDController
 RETURN_FROM_REDIRECT = '<script>document.location.href = document.referrer</script>'
 app = Flask(__name__)
 controllerChain = ControllerChain()
-controllerChain.add_controller()
 
 
 @app.route('/')
