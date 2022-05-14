@@ -7,9 +7,9 @@ to load as possible. Supports adding / renaming / removing controllers.
 
 ## How it works
 
-The user inputs the desired color and brightness, which is then sent to the P9813 controller through the PI's GPIO. The
-controllers can be wired in series and are accessed through their IDs: the first controller has ID 0, the second ID 1
-etc...
+The user inputs the desired color and brightness or warmth, which is then sent to the P9813 controller through the PI's
+GPIO. The controllers can be wired in series and are accessed through their IDs: the first controller has ID 0, the
+second ID 1 etc...
 
 Data about controllers is saved in controllers.json
 

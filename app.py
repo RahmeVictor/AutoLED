@@ -1,10 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for
-
 from led_controllers import ControllerChain, LEDController
 
-RETURN_FROM_REDIRECT = '<script>document.location.href = document.referrer</script>'
+RETURN_TO_PREVIOUS_PAGE: str = '<script>document.location.href = document.referrer</script>'
 app = Flask(__name__)
-controllerChain = ControllerChain()
+controllerChain: ControllerChain = ControllerChain()
 
 
 @app.route('/')
@@ -15,23 +14,19 @@ def index():
 @app.route('/rgb_controller/<int:cid>', methods=['GET', 'POST'])
 def rgb_controller(cid: int):
     if not controllerChain.check_id_is_valid(cid):
+        # If the given id is not valid go to default controller (0)
         return redirect(url_for('rgb_controller', cid=0))
 
-    controller = controllerChain[cid]
+    controller: LEDController = controllerChain[cid]
     if request.method == 'POST':
         if 'color' in request.form:
-            controllerChain[cid].color = LEDController.hex2rgb(request.form['color'])
-            print(controller.color)
+            controller.color = LEDController.hex2rgb(request.form['color'])
 
-        if 'brightness' in request.form:
-            controller.brightness = request.form['brightness']
-            print(controller.brightness)
+        if 'warmth' in request.form:
+            warmth = float(request.form['warmth'])
+            controller.color = LEDController.kelvin2rgb(warmth)
 
-    data = {
-        'selectedController': controller,
-        'controllers': controllerChain.controllers,
-    }
-    return render_template('index.html', **data)
+    return render_template('index.html', selectedController=controller, controllers=controllerChain.controllers)
 
 
 @app.route('/add_controller', methods=['POST'])
@@ -47,7 +42,7 @@ def rename_controller():
         controllerChain[cid].name = request.form['name']
         return redirect(url_for('rgb_controller', cid=cid))
 
-    return RETURN_FROM_REDIRECT
+    return RETURN_TO_PREVIOUS_PAGE
 
 
 @app.route('/delete_controller', methods=['POST'])
@@ -56,7 +51,7 @@ def delete_controller():
     if controllerChain.check_id_is_valid(cid):
         controllerChain.delete_controller(cid=cid)
 
-    return RETURN_FROM_REDIRECT
+    return RETURN_TO_PREVIOUS_PAGE
 
 
 if __name__ == '__main__':

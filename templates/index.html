@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block head %}
     <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script> <!-- Color picker -->
-    <script src="{{ url_for('static', filename='color-picker.js') }}"></script>
+    <script src="{{ url_for('static', filename='warmth-picker.js') }}"></script>
 {% endblock %}
 
 {% block content %}
@@ -9,10 +9,10 @@
         <div id="color-container" class="centered-div">
             <div id="picker-container"></div>
 
-            <div id="brightness">
-                <label id='brightness-label' for="brightnessInput"></label>
-                <input type="range" min="1" max="100" value="{{ selectedController.brightness }}" class="slider"
-                       id="brightnessInput">
+            <div id="warmth">
+                <label id='warmth-label' for="warmthInput"></label>
+                <input type="range" min="1000" max="6000" step='50' value="{{ selectedController.warmth }}" class="slider"
+                       id="warmthInput">
             </div>
         </div>
 
@@ -21,8 +21,8 @@
             <select class="custom-dropdown" name="controllers" id="controllers"
                     onChange="window.location.href=this.value">
                 {% for controller in controllers %}
-                    <option {% if controller == selectedController %} selected {% endif %}
-                                                                      value={{ url_for('rgb_controller', cid=controller.cid) }}>{{ controller.name }}</option>
+                    <option {% if controller == selectedController %}
+                        selected {% endif %}value={{ url_for('rgb_controller', cid=controller.cid) }}>{{ controller.name }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -48,13 +48,17 @@
 
 {% block extra %}
     <script>
+        // Initialize color picker
         let colorPicker = new iro.ColorPicker("#picker-container", {
-            width: 250, // Size of the color picker
+            width: 300, // Size of the color picker
             color: "{{ selectedController.get_hex_color() }}" // Initial color
         });
 
         colorPicker.on('color:change', function (color) {
-            send_color_data(color);
+            // When color changes send the current color trough POST as HEX string
+            $.post(window.location, {
+                color: color.hexString,
+            });
         });
     </script>
 {% endblock %}
