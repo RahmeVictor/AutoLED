@@ -5,6 +5,8 @@
 Controls RGB lights using a website. Can be accessed from phone or pc. It uses minimal javascript and css to be as fast
 to load as possible. Supports adding / renaming / removing controllers.
 
+![](https://github.com/RahmeVictor/AutoLED/blob/master/images/AutoLED%20Showcase.gif)
+
 ## How it works
 
 The user inputs the desired color and brightness or warmth, which is then sent to the P9813 controller through the PI's
@@ -21,4 +23,3 @@ GPIOSim is used to simulate Raspberry's GPIO pins. It provides dummy functions t
 - P9813 based controller
 
 Built using Flask and Python 3.10
-
