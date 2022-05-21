@@ -23,3 +23,10 @@ GPIOSim is used to simulate Raspberry's GPIO pins. It provides dummy functions t
 - P9813 based controller
 
 Built using Flask and Python 3.10
+
+## How to use
+
+It can be used just as any Flask app. The main app is in AutoLED.py, it's recommended to use a WSGI server like
+gunicorn and have it autorun when the device starts.
+
+update.py automatically pulls from GitHub the latest commit.

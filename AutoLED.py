@@ -1,4 +1,9 @@
+import datetime
+
+import geocoder
 from flask import Flask, render_template, request, redirect, url_for
+from suntime import Sun
+
 from led_controllers import ControllerChain, LEDController
 
 RETURN_TO_PREVIOUS_PAGE: str = '<script>document.location.href = document.referrer</script>'
@@ -8,6 +13,7 @@ controllerChain: ControllerChain = ControllerChain()
 
 @app.route('/')
 def index():
+    get_led_intensity_from_sun()
     return redirect(url_for('rgb_controller', cid=0))
 
 
@@ -57,6 +63,28 @@ def delete_controller():
 @app.route('/kelvin2hex/<kelvin>', methods=['GET'])
 def kelvin2hex(kelvin):
     return LEDController.kelvin2hex(float(kelvin))
+
+
+def get_led_intensity_from_sun() -> float:
+    """
+    Calculates how strong the lights should be based on current location and sunset/sunrise time
+    :return: Intensity of lights from 0.0 to 1.0 (0-100%)
+    """
+    # Get today's sunrise and sunset in UTC
+    g = geocoder.ip('me')
+    latitude, longitude = g.latlng
+    sun = Sun(latitude, longitude)
+    sunrise = sun.get_sunrise_time()
+    sunset = sun.get_sunset_time()
+
+    currentTime = datetime.datetime.now()
+    currentTime = currentTime.replace(tzinfo=datetime.timezone.utc)
+
+    if sunrise < currentTime < sunset:
+        return 0
+
+    else:
+        return 1
 
 
 if __name__ == '__main__':

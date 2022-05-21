@@ -1,3 +1,5 @@
 Flask~=2.1.2
 GitPython~=3.1.27
 RPi.GPIO~=0.7.1
+geocoder~=1.38.1
+suntime~=1.2.5
