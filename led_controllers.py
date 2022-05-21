@@ -17,6 +17,7 @@ CONTROLLER_FILE_PATH: str = 'controllers.json'
 class ControllerChain:
     """
     Chain of P9813 based controller. Responsible for sending data to the controllers through the GPIO pins.
+    You can access a controller using its ID as index: ControllerChain[ControllerID]
     """
 
     def __init__(self, clockPin: int = 27, dataPin: int = 17):
@@ -42,7 +43,7 @@ class ControllerChain:
         return self.controllers[item]
 
     def _frame(self) -> None:
-        # Send 32x zeros
+        """ Send 32x zeros """
         GPIO.output(self.dataPin, 0)
         for i in range(32):
             self._clk()
@@ -70,8 +71,10 @@ class ControllerChain:
                 b <<= 1
 
     def _write_color(self, r: int, g: int, b: int) -> None:
-        # Send a checksum byte with the format "1 1 ~B7 ~B6 ~G7 ~G6 ~R7 ~R6"
-        # The checksum colour bits should bitwise NOT the data colour bits
+        """
+        Send a checksum byte with the format "1 1 ~B7 ~B6 ~G7 ~G6 ~R7 ~R6"
+        The checksum colour bits should bitwise NOT the data colour bits
+        """
         checksum = 0xC0  # 0b11000000
         checksum |= (b >> 6 & 3) << 4
         checksum |= (g >> 6 & 3) << 2
@@ -106,7 +109,7 @@ class ControllerChain:
         # End data frame 4 bytes
         self._frame()
 
-    def get_id(self, controller) -> int:
+    def get_id(self, controller: 'LEDController') -> int:
         return self.controllers.index(controller)
 
     def add_controller(self, name: str = 'Default name') -> 'LEDController':
@@ -188,11 +191,11 @@ class LEDController:
         self.blue: int = 0
 
     @property
-    def color(self) -> tuple:
+    def color(self) -> tuple[int, int, int]:
         return self.red, self.green, self.blue
 
     @color.setter
-    def color(self, value: tuple) -> None:
+    def color(self, value: tuple[int, int, int]) -> None:
         self.red, self.green, self.blue = value
         self.chain.write()
         self.chain.save_controllers()
@@ -209,10 +212,9 @@ class LEDController:
     @staticmethod
     def kelvin2rgb(colorTemperature: float) -> tuple[int, int, int]:
         """
-        Converts from K to RGB, algorithm courtesy of
         https://gist.github.com/petrklus/b1f427accdf7438606a6
         """
-        # range check
+        # Range check
         if colorTemperature < 1000:
             colorTemperature = 1000
         elif colorTemperature > 40000:
@@ -265,6 +267,10 @@ class LEDController:
                 blue = tmp_blue
 
         return int(red), int(green), int(blue)
+
+    @staticmethod
+    def kelvin2hex(kelvin: float) -> str:
+        return LEDController.rgb2hex(*LEDController.kelvin2rgb(kelvin))
 
     def get_hex_color(self) -> str:
         return self.rgb2hex(*self.color)

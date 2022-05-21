@@ -14,7 +14,7 @@ def index():
 @app.route('/rgb_controller/<int:cid>', methods=['GET', 'POST'])
 def rgb_controller(cid: int):
     if not controllerChain.check_id_is_valid(cid):
-        # If the given id is not valid go to default controller (0)
+        # If the given id is not valid go to default controller (id 0)
         return redirect(url_for('rgb_controller', cid=0))
 
     controller: LEDController = controllerChain[cid]
@@ -52,6 +52,11 @@ def delete_controller():
         controllerChain.delete_controller(cid=cid)
 
     return RETURN_TO_PREVIOUS_PAGE
+
+
+@app.route('/kelvin2hex/<kelvin>', methods=['GET'])
+def kelvin2hex(kelvin):
+    return LEDController.kelvin2hex(float(kelvin))
 
 
 if __name__ == '__main__':
