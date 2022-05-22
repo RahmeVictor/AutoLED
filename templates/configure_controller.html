@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script> <!-- Color picker -->
+    <script src="{{ url_for('static', filename='color-picker.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="center-container">
+        <div id="picker-container"></div>
+        <label for="controller-name">Controller name: </label>
+        <input id="controller-name" type="text" value="{{ controller.name }}">
+
+        <form method="post">
+            <input type="hidden" name="delete" value="True">
+            <input class="btn" type="submit" value="Delete controller">
+        </form>
+    </div>
+{% endblock %}
+
+{% block extra %}
+    <script>
+        // Send controller name every time input box changes
+        let controllerName = document.getElementById('controller-name');
+        controllerName.oninput = send_controller_name;
+
+        function send_controller_name(e) {
+            let name = e.target.value;
+            $.post(window.location, {
+                name: name,
+            });
+        }
+        initialize_color_picker();
+    </script>
+{% endblock %}

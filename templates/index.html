@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% block head %}
-    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script> <!-- Color picker -->
     <script src="{{ url_for('static', filename='warmth-picker.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script> <!-- Color picker -->
+    <script src="{{ url_for('static', filename='color-picker.js') }}"></script>
 {% endblock %}
 
 {% block content %}
@@ -29,18 +30,13 @@
 
         <div class="centered-div">
             <form action="/add_controller" method="post">
-                <input type="hidden" name="controllerID" value={{ selectedController.cid }}>
                 <label for="name">Controller name:</label>
                 <input type="text" id="name" name="name"><br>
                 <input class="btn" type="submit" value="Add controller">
-                <button class="btn" type="submit" formaction="/rename_controller">Rename controller</button>
             </form>
-        </div>
 
-        <div class="centered-div">
-            <form action="/delete_controller" method="post">
-                <input type="hidden" name="controllerID" value={{ selectedController.cid }}>
-                <input class="btn" type="submit" value="Delete current controller">
+            <form action="{{ url_for('configure_controller', cid=selectedController.cid) }}">
+                <input class="btn" type="submit" value="Configure controller">
             </form>
         </div>
     </div>
@@ -48,17 +44,11 @@
 
 {% block extra %}
     <script>
-        // Initialize color picker
-        let colorPicker = new iro.ColorPicker("#picker-container", {
-            width: 300, // Size of the color picker
-            color: "{{ selectedController.get_hex_color() }}" // Initial color
-        });
+        // Refresh page on back button
+        const [entry] = performance.getEntriesByType("navigation");
+        if (entry["type"] === "back_forward")
+            location.reload();
 
-        colorPicker.on('color:change', function (color) {
-            // When color changes send the current color trough POST as HEX string
-            $.post(window.location, {
-                color: color.hexString,
-            });
-        });
+        let colorPicker = initialize_color_picker("{{ selectedController.get_hex_color() }}");
     </script>
 {% endblock %}

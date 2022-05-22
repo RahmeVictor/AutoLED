@@ -2,7 +2,7 @@
 window.onload = function () {
     let warmth = $("#warmth")
     warmth.on('input change', send_warmth_data);
-    update_warmth_visuals().then(() => {
+    update_warmth_visuals(false).then(() => {
     });
 }
 
@@ -15,7 +15,7 @@ function send_warmth_data() {
     });
 }
 
-async function update_warmth_visuals() {
+async function update_warmth_visuals(updatePicker = true) {
     let warmthInput = document.getElementById('warmthInput');
     let kelvin = warmthInput.value
 
@@ -27,7 +27,6 @@ async function update_warmth_visuals() {
     let hex = await response.text();
 
     // Update colorPicker color
-    if (typeof colorPicker !== 'undefined') {
+    if (typeof colorPicker !== 'undefined' && updatePicker)
         colorPicker.color.hexString = hex;
-    }
 }
