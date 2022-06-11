@@ -5,6 +5,7 @@ from flask import Flask, render_template, request, redirect, url_for
 from suntime import Sun
 
 from led_controllers import ControllerChain, LEDController
+from color import Color
 
 RETURN_TO_PREVIOUS_PAGE: str = '<script>document.location.href = document.referrer</script>'
 app: Flask = Flask(__name__)
@@ -27,19 +28,23 @@ def rgb_controller(cid: int = -1):
     controller: LEDController = controllerChain[cid]
     if request.method == 'POST':
         if 'color' in request.form:
-            controller.color = LEDController.hex2rgb(request.form['color'])
+            controller.color.hex = request.form['color']
 
         if 'warmth' in request.form:
             warmth = float(request.form['warmth'])
-            controller.color = LEDController.kelvin2rgb(warmth)
+            controller.color.rgb = Color.kelvin2rgb(warmth)
 
-    return render_template('index.html', selectedController=controller, controllers=controllerChain.controllers)
+    return render_template('controller.html', selectedController=controller, controllers=controllerChain.controllers)
 
 
-@app.route('/add_controller', methods=['POST'])
+@app.route('/add_controller', methods=['GET', 'POST'])
 def add_controller():
-    newLED = controllerChain.add_controller(name=request.form['name'])
-    return redirect(url_for('rgb_controller', cid=newLED.cid))
+    controllerToAdd = LEDController()  # Create dummy controller to hold settings
+    returnValue = configure_controller_from_request(controllerToAdd)
+    if returnValue:
+        return returnValue
+
+    return render_template('configure_controller.html', controller=controllerToAdd, add_controller=True)
 
 
 @app.route('/configure_controller/<int:cid>', methods=['GET', 'POST'])
@@ -48,20 +53,33 @@ def configure_controller(cid: int):
         return RETURN_TO_PREVIOUS_PAGE  # If controller ID is not valid
 
     controller: LEDController = controllerChain[cid]
+    returnValue = configure_controller_from_request(controller)
+    if returnValue:
+        return returnValue
+
+    return render_template('configure_controller.html', controller=controller, add_controller=False)
+
+
+def configure_controller_from_request(controller: LEDController):
     if request.method == 'POST':
-        if 'delete' in request.form:
-            controllerChain.delete_controller(cid=cid)
-            return redirect(url_for('rgb_controller'))
-
         if 'name' in request.form:
-            controllerChain[cid].name = request.form['name']
+            controller.name = request.form['name']
+            controllerChain.save_controllers()
 
-    return render_template('configure_controller.html', controller=controller)
+        if 'action' in request.form:
+            action = request.form['action']
+            if action == 'delete':
+                controllerChain.delete_controller(cid=controller.cid)
+                return redirect(url_for('rgb_controller'))
+
+            elif action == 'add':
+                newLED = controllerChain.add_controller(existingController=controller)
+                return redirect(url_for('rgb_controller', cid=newLED.cid))
 
 
 @app.route('/kelvin2hex/<kelvin>', methods=['GET'])
 def kelvin2hex(kelvin):
-    return LEDController.kelvin2hex(float(kelvin))
+    return Color.kelvin2hex(float(kelvin))
 
 
 def get_led_intensity_from_sun() -> float:

@@ -1,6 +1,7 @@
 import json
-import math
 import os.path
+
+from color import Color
 
 try:
     import RPi.GPIO as GPIO
@@ -104,7 +105,7 @@ class ControllerChain:
 
         # 4 bytes for each led (checksum, red, green, blue)
         for controller in self.controllers:
-            self._write_color(*controller.color)
+            self._write_color(*controller.color.rgb)
 
         # End data frame 4 bytes
         self._frame()
@@ -112,8 +113,13 @@ class ControllerChain:
     def get_id(self, controller: 'LEDController') -> int:
         return self.controllers.index(controller)
 
-    def add_controller(self, name: str = 'Default name') -> 'LEDController':
-        controller = LEDController(chain=self, name=name)
+    def add_controller(self, name: str = 'Default name', existingController=None) -> 'LEDController':
+        if existingController:
+            controller = existingController
+            controller.chain = self
+        else:
+            controller = LEDController(chain=self, name=name)
+
         self.controllers.append(controller)
         controller.cid = self.get_id(controller)
         self.save_controllers()
@@ -146,12 +152,9 @@ class ControllerChain:
         """
 
         savedControllers = {self.cid: []}
-        dataToSave = ['name', 'color']  # Name of controller proprieties to save
         for controller in self.controllers:
             # Create a dict with the controller data
-            controllerDict: dict = {}
-            for data in dataToSave:
-                controllerDict[data] = getattr(controller, data)
+            controllerDict: dict = {'name': controller.name, 'color': controller.color.rgb}
 
             # Add the controller data to the list. The id is saved as the index in the list
             savedControllers[self.cid].append(controllerDict)
@@ -167,13 +170,13 @@ class ControllerChain:
         for controller in self.controllers:
             self.delete_controller(controller.cid)
 
-        with open(CONTROLLER_FILE_PATH, "r") as readFile:
+        with open(CONTROLLER_FILE_PATH, 'r') as readFile:
             data = json.load(readFile)
             savedControllers = data[str(self.cid)]
             for savedController in savedControllers:
                 controller = self.add_controller()
-                for key in savedController:
-                    setattr(controller, key, savedController[key])
+                controller.name = savedController['name']
+                controller.color.rgb = savedController['color']
 
 
 class LEDController:
@@ -182,95 +185,13 @@ class LEDController:
     The id is the same as the index in the controller chain and is set by the chain automatically.
     """
 
-    def __init__(self, chain: ControllerChain, name: str = "Controller 1"):
-        self.name: str = name
+    def __init__(self, chain: ControllerChain = None, name: str = "Controller 1"):
         self.chain: ControllerChain = chain  # Chain that owns this controller
+        self.name: str = name
         self.cid: int = -1  # Controller ID
-        self.red: int = 0
-        self.green: int = 0
-        self.blue: int = 0
+        self.color: Color = Color(owner=self)
 
-    @property
-    def color(self) -> tuple[int, int, int]:
-        return self.red, self.green, self.blue
-
-    @color.setter
-    def color(self, value: tuple[int, int, int]) -> None:
-        self.red, self.green, self.blue = value
-        self.chain.write()
-        self.chain.save_controllers()
-
-    @staticmethod
-    def rgb2hex(r: int, g: int, b: int) -> str:
-        return '#' + ''.join(f'{i:02X}' for i in (r, g, b))
-
-    @staticmethod
-    def hex2rgb(h: str) -> tuple:
-        h = h.lstrip('#')
-        return tuple(int(h[i:i + 2], 16) for i in (0, 2, 4))
-
-    @staticmethod
-    def kelvin2rgb(colorTemperature: float) -> tuple[int, int, int]:
-        """
-        https://gist.github.com/petrklus/b1f427accdf7438606a6
-        """
-        # Range check
-        if colorTemperature < 1000:
-            colorTemperature = 1000
-        elif colorTemperature > 40000:
-            colorTemperature = 40000
-
-        tmpInternal = colorTemperature / 100.0
-
-        # Red
-        if tmpInternal <= 66:
-            red = 255
-        else:
-            tmp_red = 329.698727446 * (tmpInternal - 60 ** 0.1332047592)
-            if tmp_red < 0:
-                red = 0
-            elif tmp_red > 255:
-                red = 255
-            else:
-                red = tmp_red
-
-        # Green
-        if tmpInternal <= 66:
-            tmp_green = 99.4708025861 * math.log(tmpInternal) - 161.1195681661
-            if tmp_green < 0:
-                green = 0
-            elif tmp_green > 255:
-                green = 255
-            else:
-                green = tmp_green
-        else:
-            tmp_green = 288.1221695283 * (tmpInternal - 60 ** -0.0755148492)
-            if tmp_green < 0:
-                green = 0
-            elif tmp_green > 255:
-                green = 255
-            else:
-                green = tmp_green
-
-        # Blue
-        if tmpInternal >= 66:
-            blue = 255
-        elif tmpInternal <= 19:
-            blue = 0
-        else:
-            tmp_blue = 138.5177312231 * math.log(tmpInternal - 10) - 305.0447927307
-            if tmp_blue < 0:
-                blue = 0
-            elif tmp_blue > 255:
-                blue = 255
-            else:
-                blue = tmp_blue
-
-        return int(red), int(green), int(blue)
-
-    @staticmethod
-    def kelvin2hex(kelvin: float) -> str:
-        return LEDController.rgb2hex(*LEDController.kelvin2rgb(kelvin))
-
-    def get_hex_color(self) -> str:
-        return self.rgb2hex(*self.color)
+    def on_color_changed(self) -> None:
+        if self.chain:
+            self.chain.write()
+            self.chain.save_controllers()

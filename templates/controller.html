@@ -7,17 +7,14 @@
 
 {% block content %}
     <div class="center-container">
-        <div id="color-container" class="centered-div">
-            <div id="picker-container"></div>
-
-            <div id="warmth">
-                <label id='warmth-label' for="warmthInput"></label>
-                <input type="range" min="1000" max="6600" step='50' value="{{ selectedController.warmth }}"
-                       class="slider" id="warmthInput">
-            </div>
+        <div id="picker-container"></div>
+        <div id="warmth">
+            <label id='warmth-label' for="warmthInput"></label>
+            <input type="range" min="1000" max="6600" step='50' value="{{ selectedController.warmth }}"
+                   class="slider" id="warmthInput">
         </div>
 
-        <div id="choose-controller-container" class="centered-div">
+        <div id="choose-controller-container" class="wrap-div">
             <label for="controllers">Choose a controller:</label>
             <select class="custom-dropdown" name="controllers" id="controllers"
                     onChange="window.location.href=this.value">
@@ -28,16 +25,13 @@
             </select>
         </div>
 
-        <div class="centered-div">
-            <form action="/add_controller" method="post">
-                <label for="name">Controller name:</label>
-                <input type="text" id="name" name="name"><br>
-                <input class="btn" type="submit" value="Add controller">
-            </form>
-
-            <form action="{{ url_for('configure_controller', cid=selectedController.cid) }}">
-                <input class="btn" type="submit" value="Configure controller">
-            </form>
+        <div class="button-div">
+            <button onclick="location.href='{{ url_for('configure_controller', cid=selectedController.cid) }}'"
+                    type="button">Configure controller
+            </button>
+            <button onclick="location.href='{{ url_for('add_controller') }}'"
+                    type="button">Add controller
+            </button>
         </div>
     </div>
 {% endblock %}
@@ -49,6 +43,6 @@
         if (entry["type"] === "back_forward")
             location.reload();
 
-        let colorPicker = initialize_color_picker("{{ selectedController.get_hex_color() }}");
+        let colorPicker = initialize_color_picker("{{ selectedController.color.hex }}");
     </script>
 {% endblock %}

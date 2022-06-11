@@ -8,28 +8,24 @@
 {% block content %}
     <div class="center-container">
         <div id="picker-container"></div>
-        <label for="controller-name">Controller name: </label>
-        <input id="controller-name" type="text" value="{{ controller.name }}">
-
         <form method="post">
-            <input type="hidden" name="delete" value="True">
-            <input class="btn" type="submit" value="Delete controller">
+            <input type="hidden" name="action" value="{% if add_controller %}add{% else %}delete{% endif %}">
+            <label for="controller-name">Controller name</label>
+            <input id="controller-name" name="name" type="text" value="{{ controller.name }}"
+                   oninput="post_controller_data()">
+            <input class="btn" type="submit" value="{% if add_controller %}Add{% else %}Delete{% endif %} controller">
         </form>
     </div>
 {% endblock %}
 
 {% block extra %}
     <script>
-        // Send controller name every time input box changes
-        let controllerName = document.getElementById('controller-name');
-        controllerName.oninput = send_controller_name;
+        initialize_color_picker();
 
-        function send_controller_name(e) {
-            let name = e.target.value;
+        function post_controller_data() {
             $.post(window.location, {
-                name: name,
+                name: document.getElementById('controller-name').value,
             });
         }
-        initialize_color_picker();
     </script>
 {% endblock %}

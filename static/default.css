@@ -2,7 +2,13 @@ body {
     font-size: 1.2em;
 }
 
-.btn {
+
+form > * {
+    margin: .5em 0 .5em;
+}
+
+
+.btn, button {
     background-color: rgba(51, 51, 51, 0.05);
     border-radius: .75em;
     border-width: 0;
@@ -10,11 +16,19 @@ body {
     cursor: pointer;
     display: flex;
     padding: .7em .9em;
-    margin: .5em;
     transition: all 200ms;
     user-select: none;
     -webkit-user-select: none;
     touch-action: manipulation;
+}
+
+.button-div {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.button-div > * {
+    margin: .5em
 }
 
 .slider {
@@ -55,24 +69,27 @@ body {
 }
 
 input[type=text] {
-    padding: .1em;
-    margin: .5em;
+    padding: .5em;
     border: 2px solid #eee;
     border-radius: .5em;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.centered-div {
+.wrap-div {
     padding: .2em;
-    display: block;
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .center-container {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: inline-block;
+    display: flex;
+    min-height: 0;
     text-align: center;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Custom Select wrapper */
