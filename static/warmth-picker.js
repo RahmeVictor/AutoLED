@@ -1,32 +1,19 @@
 // When the page loads attach a function on warmth picker input change
-window.onload = function () {
-    let warmth = $("#warmth")
-    warmth.on('input change', send_warmth_data);
+window.addEventListener('load', function() {
+    let warmth = document.getElementById('warmthInput');
+    warmth.oninput = update_warmth_visuals;
     update_warmth_visuals(false).then(() => {
     });
-}
-
-function send_warmth_data() {
-    let warmth = document.getElementById('warmthInput');
-    $.post(window.location, {
-        warmth: warmth.value
-    });
-    update_warmth_visuals().then(() => {
-    });
-}
+})
 
 async function update_warmth_visuals(updatePicker = true) {
-    let warmthInput = document.getElementById('warmthInput');
-    let kelvin = warmthInput.value
-
     // Update text
+    let kelvin = document.getElementById('warmthInput').value;
     document.getElementById('warmth-label').innerHTML = 'Warmth: ' + kelvin + 'k';
 
-    // Update color using fetch
-    let response = await fetch('/kelvin2hex/' + kelvin);
-    let hex = await response.text();
-
-    // Update colorPicker color
-    if (typeof colorPicker !== 'undefined' && updatePicker)
-        colorPicker.color.hexString = hex;
+    // Update colorPicker color from kelvin input using fetch
+    if (typeof colorPicker !== 'undefined' && updatePicker) {
+        let response = await fetch('/kelvin2hex/' + kelvin);
+        colorPicker.color.hexString = await response.text();
+    }
 }

@@ -1,18 +1,18 @@
 import json
 import os.path
 
-from color import Color
+from controller.color import Color
 
 try:
     import RPi.GPIO as GPIO
 
 except ImportError:
     import warnings
-    import GPIOSim as GPIO
+    import controller.GPIOSim as GPIO
 
     warnings.warn("USING GPIO EMULATOR, INSTALL Rpi.GPIO", RuntimeWarning)
 
-CONTROLLER_FILE_PATH: str = 'controllers.json'
+CONTROLLER_FILE_PATH: str = os.path.join(os.path.join(os.getcwd(), 'controller'), 'controllers.json')
 
 
 class ControllerChain:

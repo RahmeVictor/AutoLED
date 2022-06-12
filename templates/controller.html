@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block head %}
     <script src="{{ url_for('static', filename='warmth-picker.js') }}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script> <!-- Color picker -->
+    <script async src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script> <!-- Color picker -->
     <script src="{{ url_for('static', filename='color-picker.js') }}"></script>
 {% endblock %}
 
@@ -43,6 +43,8 @@
         if (entry["type"] === "back_forward")
             location.reload();
 
-        let colorPicker = initialize_color_picker("{{ selectedController.color.hex }}");
+        // Add color picker
+        let colorPicker;
+        initialize_color_picker("{{ selectedController.color.hex }}");
     </script>
 {% endblock %}

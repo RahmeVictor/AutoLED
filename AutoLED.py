@@ -4,8 +4,8 @@ import geocoder
 from flask import Flask, render_template, request, redirect, url_for
 from suntime import Sun
 
-from led_controllers import ControllerChain, LEDController
-from color import Color
+from controller.led_controllers import ControllerChain, LEDController
+from controller.color import Color
 
 RETURN_TO_PREVIOUS_PAGE: str = '<script>document.location.href = document.referrer</script>'
 app: Flask = Flask(__name__)
@@ -27,11 +27,12 @@ def rgb_controller(cid: int = -1):
 
     controller: LEDController = controllerChain[cid]
     if request.method == 'POST':
-        if 'color' in request.form:
-            controller.color.hex = request.form['color']
+        data = request.get_json()
+        if 'color' in data:
+            controller.color.hex = data['color']
 
-        if 'warmth' in request.form:
-            warmth = float(request.form['warmth'])
+        if 'warmth' in data:
+            warmth = float(data['warmth'])
             controller.color.rgb = Color.kelvin2rgb(warmth)
 
     return render_template('controller.html', selectedController=controller, controllers=controllerChain.controllers)
@@ -62,12 +63,17 @@ def configure_controller(cid: int):
 
 def configure_controller_from_request(controller: LEDController):
     if request.method == 'POST':
-        if 'name' in request.form:
-            controller.name = request.form['name']
+        # Data can be taken from a form or from a fetch post (json)
+        data = request.form
+        if not data:
+            data = request.get_json()
+
+        if 'name' in data:
+            controller.name = data['name']
             controllerChain.save_controllers()
 
-        if 'action' in request.form:
-            action = request.form['action']
+        if 'action' in data:
+            action = data['action']
             if action == 'delete':
                 controllerChain.delete_controller(cid=controller.cid)
                 return redirect(url_for('rgb_controller'))

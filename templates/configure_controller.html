@@ -13,17 +13,23 @@
             <label for="controller-name">Controller name</label>
             <input id="controller-name" name="name" type="text" value="{{ controller.name }}"
                    oninput="post_controller_data()">
-            <input class="btn" type="submit" value="{% if add_controller %}Add{% else %}Delete{% endif %} controller">
+
+            <div class="button-div">
+                <button>{% if add_controller %}Add{% else %}Delete{% endif %} controller</button>
+                <button type="button" onclick="document.location.href = document.referrer">Back</button>
+            </div>
         </form>
     </div>
 {% endblock %}
 
 {% block extra %}
     <script>
-        initialize_color_picker();
+        // Add color picker
+        let colorPicker;
+        initialize_color_picker("{{ selectedController.color.hex }}");
 
         function post_controller_data() {
-            $.post(window.location, {
+            post_data(window.location, {
                 name: document.getElementById('controller-name').value,
             });
         }
