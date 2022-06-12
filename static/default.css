@@ -14,7 +14,6 @@ form > * {
     border-width: 0;
     color: #333333;
     cursor: pointer;
-    display: flex;
     padding: .7em .9em;
     transition: all 200ms;
     user-select: none;
@@ -26,6 +25,10 @@ form > * {
     display: flex;
     flex-wrap: wrap;
     gap: .5em;
+}
+
+.button-div > .btn, button{
+    flex-grow: 1;
 }
 
 .slider {
@@ -74,15 +77,22 @@ input[type=text] {
     flex-wrap: wrap;
 }
 
+.center-content{
+    display: flex;
+    justify-content: center;
+}
+
 .center-container {
     display: flex;
-    min-height: 0;
     text-align: center;
     flex-direction: column;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: center;
     gap: .7em;
+}
+
+.center-container > *{
+    width: 100%;
 }
 
 /* Custom Select wrapper */

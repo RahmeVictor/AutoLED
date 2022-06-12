@@ -6,32 +6,35 @@
 {% endblock %}
 
 {% block content %}
-    <div class="center-container">
-        <div id="picker-container"></div>
-        <div id="warmth">
-            <label id='warmth-label' for="warmthInput"></label>
-            <input type="range" min="1000" max="6600" step='50' value="{{ selectedController.warmth }}"
-                   class="slider" id="warmthInput">
-        </div>
+    <div class="center-content">
+        <div class="center-container">
+            <div id="picker-container"></div>
+            <div id="warmth">
+                <label id='warmth-label' for="warmthInput"></label>
+                <input type="range" min="1000" max="6600" step='50' value="{{ selectedController.warmth }}"
+                       class="slider" id="warmthInput">
+            </div>
 
-        <div id="choose-controller-container" class="wrap-div">
-            <label for="controllers">Choose a controller:</label>
-            <select class="custom-dropdown" name="controllers" id="controllers"
-                    onChange="window.location.href=this.value">
-                {% for controller in controllers %}
-                    <option {% if controller == selectedController %}
-                        selected {% endif %}value={{ url_for('rgb_controller', cid=controller.cid) }}>{{ controller.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
+            <div id="choose-controller-container" class="wrap-div">
+                <label for="controllers">Choose a controller:</label>
+                <select class="custom-dropdown" name="controllers" id="controllers"
+                        onChange="window.location.href=this.value">
+                    {% for controller in controllers %}
+                        <option {% if controller == selectedController %}
+                            selected {% endif %}value={{ url_for('rgb_controller', cid=controller.cid) }}>{{ controller.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-        <div class="button-div">
-            <button onclick="location.href='{{ url_for('configure_controller', cid=selectedController.cid) }}'"
-                    type="button">Configure controller
-            </button>
-            <button onclick="location.href='{{ url_for('add_controller') }}'"
-                    type="button">Add controller
-            </button>
+
+            <div class="button-div">
+                <button onclick="location.href='{{ url_for('configure_controller', cid=selectedController.cid) }}'"
+                        type="button">Configure controller
+                </button>
+                <button onclick="location.href='{{ url_for('add_controller') }}'"
+                        type="button">Add controller
+                </button>
+            </div>
         </div>
     </div>
 {% endblock %}

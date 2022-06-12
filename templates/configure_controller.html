@@ -6,19 +6,21 @@
 {% endblock %}
 
 {% block content %}
-    <div class="center-container">
-        <div id="picker-container"></div>
-        <form method="post">
-            <input type="hidden" name="action" value="{% if add_controller %}add{% else %}delete{% endif %}">
-            <label for="controller-name">Controller name</label>
-            <input id="controller-name" name="name" type="text" value="{{ controller.name }}"
-                   oninput="post_controller_data()">
+    <div class="center-content">
+        <div class="center-container">
+            <div id="picker-container"></div>
+            <form method="post">
+                <input type="hidden" name="action" value="{% if add_controller %}add{% else %}delete{% endif %}">
+                <label for="controller-name">Controller name</label>
+                <input id="controller-name" name="name" type="text" value="{{ controller.name }}"
+                       oninput="post_controller_data()">
 
-            <div class="button-div">
-                <button>{% if add_controller %}Add{% else %}Delete{% endif %} controller</button>
-                <button type="button" onclick="document.location.href = document.referrer">Back</button>
-            </div>
-        </form>
+                <div class="button-div">
+                    <button>{% if add_controller %}Add{% else %}Delete{% endif %} controller</button>
+                    <button type="button" onclick="document.location.href = document.referrer">Back</button>
+                </div>
+            </form>
+        </div>
     </div>
 {% endblock %}
 
@@ -26,7 +28,7 @@
     <script>
         // Add color picker
         let colorPicker;
-        initialize_color_picker("{{ selectedController.color.hex }}");
+        initialize_color_picker("{{ controller.color.hex }}");
 
         function post_controller_data() {
             post_data(window.location, {
