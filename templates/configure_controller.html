@@ -8,6 +8,7 @@
 {% block content %}
     <div class="center-content">
         <div class="center-container">
+            <p>Calibrate color (white point)</p>
             <div id="picker-container"></div>
             <form method="post">
                 <input type="hidden" name="action" value="{% if add_controller %}add{% else %}delete{% endif %}">
@@ -28,7 +29,7 @@
     <script>
         // Add color picker
         let colorPicker;
-        initialize_color_picker("{{ controller.color.hex }}");
+        initialize_color_picker({{ controller.color.get_hsv_for_js() }});
 
         function post_controller_data() {
             post_data(window.location, {

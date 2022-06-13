@@ -149,12 +149,13 @@ class ControllerChain:
         Objects are saved in JSON format as follows:
         {ChainID(1): [controller1, controller2, ...], ChainID(2):[...], ...}
         Where controller1, controller2 etc. is the data associated with the controller as a dict.
+        Color data is saved as HSV
         """
 
         savedControllers = {self.cid: []}
         for controller in self.controllers:
             # Create a dict with the controller data
-            controllerDict: dict = {'name': controller.name, 'color': controller.color.rgb}
+            controllerDict: dict = {'name': controller.name, 'color': controller.color.hsv}
 
             # Add the controller data to the list. The id is saved as the index in the list
             savedControllers[self.cid].append(controllerDict)
@@ -171,12 +172,18 @@ class ControllerChain:
             self.delete_controller(controller.cid)
 
         with open(CONTROLLER_FILE_PATH, 'r') as readFile:
-            data = json.load(readFile)
+            try:
+                data = json.load(readFile)
+
+            except json.JSONDecodeError:
+                self.add_controller()
+                return  # Save data was corrupt or didn't exist, create a new controller and exit
+
             savedControllers = data[str(self.cid)]
             for savedController in savedControllers:
                 controller = self.add_controller()
                 controller.name = savedController['name']
-                controller.color.rgb = savedController['color']
+                controller.color.hsv = savedController['color']
 
 
 class LEDController:

@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block head %}
-    <script src="{{ url_for('static', filename='warmth-picker.js') }}"></script>
+    <script src="{{ url_for('static', filename='temperature-picker.js') }}"></script>
     <script async src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script> <!-- Color picker -->
     <script src="{{ url_for('static', filename='color-picker.js') }}"></script>
 {% endblock %}
@@ -8,11 +8,12 @@
 {% block content %}
     <div class="center-content">
         <div class="center-container">
+            <p></p>
             <div id="picker-container"></div>
-            <div id="warmth">
-                <label id='warmth-label' for="warmthInput"></label>
-                <input type="range" min="1000" max="6600" step='50' value="{{ selectedController.warmth }}"
-                       class="slider" id="warmthInput">
+            <div id="temperature">
+                <label id='temperature-label' for="temperatureInput"></label>
+                <input type="range" min="1000" max="6600" step='50' value="{{ selectedController.temperature }}"
+                       class="slider" id="temperatureInput">
             </div>
 
             <div id="choose-controller-container" class="wrap-div">
@@ -48,6 +49,6 @@
 
         // Add color picker
         let colorPicker;
-        initialize_color_picker("{{ selectedController.color.hex }}");
+        initialize_color_picker({{ selectedController.color.get_hsv_for_js() }});
     </script>
 {% endblock %}

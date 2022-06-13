@@ -29,11 +29,11 @@ def rgb_controller(cid: int = -1):
     if request.method == 'POST':
         data = request.get_json()
         if 'color' in data:
-            controller.color.hex = data['color']
+            color = data['color']
+            controller.color.hsv = color['h'], color['s'], color['v']
 
-        if 'warmth' in data:
-            warmth = float(data['warmth'])
-            controller.color.rgb = Color.kelvin2rgb(warmth)
+        if 'temperature' in data:
+            controller.temperature = float(data['temperature'])
 
     return render_template('controller.html', selectedController=controller, controllers=controllerChain.controllers)
 
