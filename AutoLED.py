@@ -72,6 +72,11 @@ def configure_controller_from_request(controller: LEDController):
             controller.name = data['name']
             controllerChain.save_controllers()
 
+        if 'color' in data:
+            color = data['color']
+            controller.calibration.hsv = color['h'], color['s'], color['v']
+            controllerChain.save_controllers()
+
         if 'action' in data:
             action = data['action']
             if action == 'delete':
@@ -81,11 +86,6 @@ def configure_controller_from_request(controller: LEDController):
             elif action == 'add':
                 newLED = controllerChain.add_controller(existingController=controller)
                 return redirect(url_for('rgb_controller', cid=newLED.cid))
-
-
-@app.route('/kelvin2hex/<kelvin>', methods=['GET'])
-def kelvin2hex(kelvin):
-    return Color.kelvin2hex(float(kelvin))
 
 
 def get_led_intensity_from_sun() -> float:

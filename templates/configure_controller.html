@@ -29,7 +29,7 @@
     <script>
         // Add color picker
         let colorPicker;
-        initialize_color_picker({{ controller.color.get_hsv_for_js() }});
+        initialize_color_picker({{ controller.calibration.get_hsv_for_js() }});
 
         function post_controller_data() {
             post_data(window.location, {

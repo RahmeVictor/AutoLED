@@ -3,8 +3,11 @@ body {
 }
 
 
-form > * {
-    margin: .5em 0 .5em;
+form {
+    display: flex;
+    flex-direction: column;
+    gap: .7em;
+    width: 100%;
 }
 
 
@@ -12,6 +15,11 @@ form > * {
     display: flex;
     flex-wrap: wrap;
     gap: .5em;
+    width: 100%;
+}
+
+.button-div > * {
+    flex: 1;
 }
 
 button {
@@ -71,9 +79,10 @@ input[type=text] {
 .wrap-div {
     display: flex;
     flex-wrap: wrap;
+    width: 100%;
 }
 
-.center-content{
+.center-content {
     display: flex;
     justify-content: center;
 }
@@ -85,10 +94,6 @@ input[type=text] {
     flex-wrap: wrap;
     align-items: center;
     gap: .7em;
-}
-
-.center-container > *{
-    width: 100%;
 }
 
 /* Custom Select wrapper */
