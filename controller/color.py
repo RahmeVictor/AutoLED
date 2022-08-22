@@ -50,8 +50,7 @@ class Color:
 
     @property
     def temperature(self) -> int:
-        # TODO
-        return 0
+        return self.rgb2kelvin()
 
     @temperature.setter
     def temperature(self, value: int) -> None:
@@ -69,8 +68,9 @@ class Color:
         return tuple(int(h[i:i + 2], 16) for i in (0, 2, 4))
 
     @staticmethod
-    def kelvin2hex(kelvin: float) -> str:
-        return Color.rgb2hex(*Color.kelvin2rgb(kelvin))
+    def rgb2kelvin() -> int:
+        # TODO
+        return 0
 
     @staticmethod
     def kelvin2rgb(colorTemperature: float) -> tuple[int, int, int]:

@@ -5,7 +5,6 @@ from flask import Flask, render_template, request, redirect, url_for
 from suntime import Sun
 
 from controller.led_controllers import ControllerChain, LEDController
-from controller.color import Color
 
 RETURN_TO_PREVIOUS_PAGE: str = '<script>document.location.href = document.referrer</script>'
 app: Flask = Flask(__name__)
@@ -64,7 +63,7 @@ def configure_controller(cid: int):
 def configure_controller_from_request(controller: LEDController):
     if request.method == 'POST':
         # Data can be taken from a form or from a fetch post (json)
-        data = request.form
+        data: dict = request.form
         if not data:
             data = request.get_json()
 
@@ -73,7 +72,7 @@ def configure_controller_from_request(controller: LEDController):
             controllerChain.save_controllers()
 
         if 'color' in data:
-            color = data['color']
+            color: dict = data['color']
             controller.calibration.hsv = color['h'], color['s'], color['v']
             controllerChain.save_controllers()
 
