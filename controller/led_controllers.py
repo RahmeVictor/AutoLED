@@ -1,5 +1,6 @@
 import json
 import os.path
+from pathlib import Path
 
 from controller.color import Color
 
@@ -12,7 +13,9 @@ except ImportError:
 
     warnings.warn("USING GPIO EMULATOR, INSTALL Rpi.GPIO", RuntimeWarning)
 
-CONTROLLER_FILE_PATH: str = os.path.join(os.path.join(os.getcwd(), 'controller'), 'controllers.json')
+# CONTROLLER_FILE_PATH: str = r'C:\Users\nextproject13-laptop\Documents\AutoLED\controller\controllers.json'
+script_dir = os.path.dirname(__file__)
+CONTROLLER_FILE_PATH: Path = Path(script_dir, 'controllers.json')
 
 
 class ControllerChain:
@@ -113,7 +116,8 @@ class ControllerChain:
     def get_id(self, controller: 'LEDController') -> int:
         return self.controllers.index(controller)
 
-    def add_controller(self, name: str = 'Default name', existingController=None) -> 'LEDController':
+    def add_controller(self, name: str = 'Default name',
+                       existingController=None) -> 'LEDController':
         if existingController:
             controller = existingController
             controller.chain = self
@@ -165,7 +169,7 @@ class ControllerChain:
             json.dump(savedControllers, writeFile)
 
     def load_controllers(self) -> None:
-        if not os.path.exists(CONTROLLER_FILE_PATH):
+        if not CONTROLLER_FILE_PATH.exists():
             return  # If file does not exist, don't load anything
 
         # Delete all controllers
