@@ -1,7 +1,9 @@
 import datetime
+import random
 
 import geocoder
 from flask import Flask, render_template, request, redirect, url_for
+from flask_apscheduler import APScheduler
 from suntime import Sun
 
 from controller.led_controllers import ControllerChain, LEDController
@@ -9,6 +11,42 @@ from controller.led_controllers import ControllerChain, LEDController
 RETURN_TO_PREVIOUS_PAGE: str = '<script>document.location.href = document.referrer</script>'
 app: Flask = Flask(__name__)
 controllerChain: ControllerChain = ControllerChain()
+
+# Sunlight sensor
+sunlight: bool = False
+# Water sensor
+water: bool = False
+
+
+def set_from_light_sensor():
+    global sunlight
+    try:
+        import RPi.GPIO as GPIO
+
+    except ImportError:
+        sunlight = bool(random.getrandbits(1))
+
+    for controller in controllerChain:
+        if controller.use_light_sensor:
+            calculated_color = list(controller.color.hsv)
+            calculated_color[2] = 100 if sunlight else 0
+            controller.color.hsv = calculated_color
+
+
+def get_water_sensor():
+    global water
+    try:
+        import RPi.GPIO as GPIO
+
+    except ImportError:
+        water = bool(random.getrandbits(1))
+
+
+scheduler = APScheduler()
+scheduler.init_app(app)
+scheduler.start()
+scheduler.add_job(id='set_from_light_sensor', func=set_from_light_sensor, trigger='interval', seconds=1)
+scheduler.add_job(id='get_water_sensor', func=get_water_sensor, trigger='interval', seconds=1)
 
 
 @app.route('/')
@@ -34,7 +72,8 @@ def rgb_controller(cid: int = -1):
         if 'temperature' in data:
             controller.temperature = float(data['temperature'])
 
-    return render_template('controller.html', selectedController=controller, controllers=controllerChain.controllers)
+    return render_template('controller.html', selectedController=controller, controllers=controllerChain.controllers,
+                           water=water)
 
 
 @app.route('/add_controller', methods=['GET', 'POST'])
@@ -69,6 +108,10 @@ def configure_controller_from_request(controller: LEDController):
 
         if 'name' in data:
             controller.name = data['name']
+            controllerChain.save_controllers()
+
+        if 'use_light_sensor' in data:
+            controller.use_light_sensor = data['use_light_sensor']
             controllerChain.save_controllers()
 
         if 'color' in data:

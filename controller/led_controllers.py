@@ -160,6 +160,7 @@ class ControllerChain:
         for controller in self.controllers:
             # Create a dict with the controller data
             controllerDict: dict = {'name': controller.name, 'color': controller.color.hsv,
+                                    'use_light_sensor': controller.use_light_sensor,
                                     'calibration': controller.calibration.hsv}
 
             # Add the controller data to the list. The id is saved as the index in the list
@@ -188,6 +189,7 @@ class ControllerChain:
             for savedController in savedControllers:
                 controller = self.add_controller()
                 controller.name = savedController['name']
+                controller.use_light_sensor = savedController['use_light_sensor']
                 controller.color.hsv = savedController['color']
                 controller.calibration.hsv = savedController['calibration']
 
@@ -201,6 +203,7 @@ class LEDController:
     def __init__(self, chain: ControllerChain = None, name: str = "Controller 1"):
         self.chain: ControllerChain = chain  # Chain that owns this controller
         self.name: str = name
+        self.use_light_sensor: bool = True
         self.cid: int = -1  # Controller ID
         self.color: Color = Color(owner=self)
         self.calibration: Color = Color(owner=self)

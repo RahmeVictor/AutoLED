@@ -16,6 +16,9 @@
                 <input id="controller-name" name="name" type="text" value="{{ controller.name }}"
                        oninput="post_controller_data()">
 
+                <label for="use_light_sensor">Folosește senzor lumina</label>
+                <input type="checkbox" id="use_light_sensor" name="use_light_sensor" oninput="post_controller_data()"
+                        {% if controller.use_light_sensor %} checked {% endif %}>
                 <div class="button-div">
                     <button>{% if add_controller %}Add{% else %}Delete{% endif %} controller</button>
                     <button type="button" onclick="document.location.href = document.referrer">Back</button>
@@ -34,6 +37,8 @@
         function post_controller_data() {
             post_data(window.location, {
                 name: document.getElementById('controller-name').value,
+                use_light_sensor:  document.getElementById('use_light_sensor').checked
+
             });
         }
     </script>

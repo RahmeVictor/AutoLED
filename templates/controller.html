@@ -30,6 +30,14 @@
                         type="button">Add controller
                 </button>
             </div>
+
+            <div>
+                {% if water %}
+                    <h1 style="color: indianred">Florile nu mai au apa!</h1>
+                {% else %}
+                    <h1 style="color: cornflowerblue">Florile au suficientă apa.</h1>
+                {% endif %}
+            </div>
         </div>
     </div>
 {% endblock %}
