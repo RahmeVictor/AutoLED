@@ -189,7 +189,7 @@ class ControllerChain:
             for savedController in savedControllers:
                 controller = self.add_controller()
                 controller.name = savedController['name']
-                controller.use_light_sensor = savedController['use_light_sensor']
+                controller.use_light_sensor = savedController.get('use_light_sensor', True)
                 controller.color.hsv = savedController['color']
                 controller.calibration.hsv = savedController['calibration']
 
