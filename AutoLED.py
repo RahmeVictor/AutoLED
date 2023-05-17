@@ -51,7 +51,7 @@ def set_from_light_sensor():
 def get_water_sensor():
     global water, override
     if not override:
-        water = not bool(GPIO.input(water_pin))
+        water = bool(GPIO.input(water_pin))
         # water = bool(random.getrandbits(1))
 
 
