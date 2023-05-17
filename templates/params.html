@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block head %}
+{% endblock %}
+
+{% block content %}
+    <div class="center-content">
+        <div class="center-container">
+            <form method="post">
+                <label for="light">Lumina</label>
+                <input type="checkbox" id="light" name="light" oninput="post_controller_data()"
+                        {% if sunlight %} checked {% endif %}>
+
+                <label for="water">Apa</label>
+                <input type="checkbox" id="water" name="water" oninput="post_controller_data()"
+                        {% if water %} checked {% endif %}>
+
+                <label for="override">Override</label>
+                <input type="checkbox" id="override" name="override" oninput="post_controller_data()"
+                        {% if override %} checked {% endif %}>
+                <div class="button-div">
+                    <button type="button" onclick="document.location.href = document.referrer">Back</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra %}
+    <script>
+        function post_controller_data() {
+            post_data(window.location, {
+                water: document.getElementById('water').checked,
+                sunlight:  document.getElementById('light').checked,
+                override: document.getElementById('override').checked
+            });
+        }
+    </script>
+{% endblock %}

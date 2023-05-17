@@ -1,5 +1,4 @@
 import datetime
-import random
 
 import geocoder
 from flask import Flask, render_template, request, redirect, url_for
@@ -17,14 +16,27 @@ sunlight: bool = False
 # Water sensor
 water: bool = False
 
+override: bool = False
+
+light_pin: int = 23
+water_pin: int = 5
+
+try:
+    import RPi.GPIO as GPIO
+
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(light_pin, GPIO.IN)
+    GPIO.setup(water_pin, GPIO.IN)
+
+except ImportError:
+    import controller.GPIOSim as GPIO
+
 
 def set_from_light_sensor():
-    global sunlight
-    try:
-        import RPi.GPIO as GPIO
+    global sunlight, override
 
-    except ImportError:
-        sunlight = bool(random.getrandbits(1))
+    if not override:
+        sunlight = GPIO.input(light_pin)
 
     for controller in controllerChain:
         if controller.use_light_sensor:
@@ -32,14 +44,15 @@ def set_from_light_sensor():
             calculated_color[2] = 100 if sunlight else 0
             controller.color.hsv = calculated_color
 
+    # if use_default and not override:
+    #     sunlight = bool(random.getrandbits(1))
+
 
 def get_water_sensor():
-    global water
-    try:
-        import RPi.GPIO as GPIO
-
-    except ImportError:
-        water = bool(random.getrandbits(1))
+    global water, override
+    if not override:
+        water = not bool(GPIO.input(water_pin))
+        # water = bool(random.getrandbits(1))
 
 
 scheduler = APScheduler()
@@ -97,6 +110,27 @@ def configure_controller(cid: int):
         return returnValue
 
     return render_template('configure_controller.html', controller=controller, add_controller=False)
+
+
+@app.route('/parameter', methods=['GET', 'POST'])
+def change_params():
+    global water, sunlight, override
+    if request.method == 'POST':
+        # Data can be taken from a form or from a fetch post (json)
+        data: dict = request.form
+        if not data:
+            data = request.get_json()
+
+        if 'override' in data:
+            override = data['override']
+
+        if 'sunlight' in data:
+            sunlight = data['sunlight']
+
+        if 'water' in data:
+            water = data['water']
+
+    return render_template('params.html', water=water, sunlight=sunlight, override=override)
 
 
 def configure_controller_from_request(controller: LEDController):

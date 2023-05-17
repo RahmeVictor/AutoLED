@@ -16,3 +16,7 @@ def output(_channel, _outmode):
 
 def setmode(_mode):
     pass
+
+
+def input(*_args, **_kwargs):
+    pass
